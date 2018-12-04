@@ -51,5 +51,23 @@ def oauth_helper(request):
 
     # Write out the final credentials that can be picked up after the following
     write_token_file(OAUTH_FILE, oauth_token, oauth_token_secret)
-    return HttpResponse("%s %s written to %s" % (oauth_token, oauth_token_secret, OAUTH_FILE))
+#     return HttpResponse("%s %s written to %s" % (oauth_token, oauth_token_secret, OAUTH_FILE))
+    return HttpResponseRedirect(request.build_absolute_uri(REDIRECT_URL_AFTER_AUTH))
 
+
+
+
+def trends(request, woe_id):
+
+    print("WOE ID", woe_id)
+    oauth_token, oauth_token_secret = read_token_file(OAUTH_FILE)
+
+    auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret,
+                                   CONSUMER_KEY, CONSUMER_SECRET)
+
+    twitter_api = twitter.Twitter(auth=auth)
+
+    trends = twitter_api.trends.place(_id=woe_id)
+#     print(json.dumps(trends, indent=1))
+
+    return HttpResponse(json.dumps(trends, indent=1))
