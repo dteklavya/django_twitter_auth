@@ -70,4 +70,14 @@ def trends(request, woe_id):
     trends = twitter_api.trends.place(_id=woe_id)
 #     print(json.dumps(trends, indent=1))
 
-    return HttpResponse(json.dumps(trends, indent=1))
+    # Some basic filters for trending topics
+    my_trends = []
+    for trend in trends[0]['trends']:
+        if trend['tweet_volume'] != None:
+            my_trends.append({
+                'name': trend['name'],
+                'tweet_volume': trend['tweet_volume'],
+                'url': trend['url']})
+
+    print(my_trends)
+    return HttpResponse(json.dumps(my_trends, indent=1))
