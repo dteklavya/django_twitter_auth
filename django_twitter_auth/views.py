@@ -31,5 +31,25 @@ def oauth_dance(request):
     # Redirect to twitter URL for user authorization.
     return HttpResponseRedirect(oauth_url)
 
-#     print("OAuth Dancing")
-#     return HttpResponse("OAuth Dancing")
+
+def oauth_helper(request):
+
+    oauth_verifier = request.GET.get('oauth_verifier')
+
+    # Pick back up credentials from ipynb_oauth_dance
+    oauth_token, oauth_token_secret = read_token_file(OAUTH_FILE)
+
+    _twitter = twitter.Twitter(
+        auth=twitter.OAuth(
+            oauth_token, oauth_token_secret, CONSUMER_KEY, CONSUMER_SECRET),
+        format='', api_version=None)
+
+    oauth_token, oauth_token_secret = parse_oauth_tokens(
+        _twitter.oauth.access_token(oauth_verifier=oauth_verifier,
+                                    oauth_token=oauth_token,
+                                    oauth_consumer_key=CONSUMER_KEY))
+
+    # Write out the final credentials that can be picked up after the following
+    write_token_file(OAUTH_FILE, oauth_token, oauth_token_secret)
+    return HttpResponse("%s %s written to %s" % (oauth_token, oauth_token_secret, OAUTH_FILE))
+
