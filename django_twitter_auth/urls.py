@@ -10,4 +10,5 @@ urlpatterns = [
     path('dance', views.oauth_dance),
     path('helper', views.oauth_helper),
     url(r'^trends/(?P<woe_id>[0-9]+)/$', views.trends),
+    path('confirm', views.confirm)
 ]

@@ -81,3 +81,19 @@ def trends(request, woe_id):
 
     print(my_trends)
     return HttpResponse(json.dumps(my_trends, indent=1))
+
+
+def confirm(request):
+    oauth_token, oauth_token_secret = read_token_file(OAUTH_FILE)
+
+    auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret,
+                                   CONSUMER_KEY, CONSUMER_SECRET)
+
+    twitter_api = twitter.Twitter(auth=auth)
+    print(oauth_token, twitter_api)
+    try:
+        twitter_api.statuses.home_timeline()
+        return HttpResponse("Twitter OAuth Dance Completed Successfully")        
+    except twitter.api.TwitterHTTPError:
+        return HttpResponse("Twitter returned error. Something went wrong with authorization.") 
+
