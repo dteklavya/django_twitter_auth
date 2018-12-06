@@ -92,7 +92,7 @@ def confirm(request):
     twitter_api = twitter.Twitter(auth=auth)
     print(oauth_token, twitter_api)
     try:
-        twitter_api.statuses.home_timeline()
+        screen_name = twitter_api.account.verify_credentials()['screen_name']
         return HttpResponse("Twitter OAuth Dance Completed Successfully")        
     except twitter.api.TwitterHTTPError:
         return HttpResponse("Twitter returned error. Something went wrong with authorization.") 
