@@ -1,5 +1,6 @@
 django_twitter_auth/config.py
 config.py
 tp_auth
-
+dist
+*.egg-info
 
