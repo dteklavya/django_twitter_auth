@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 from django.shortcuts import redirect, render_to_response, HttpResponse
 from django.shortcuts import HttpResponseRedirect
+from django.contrib.auth import login as django_login
 
 import json
 import twitter
@@ -9,6 +10,7 @@ from twitter.oauth_dance import parse_oauth_tokens
 from twitter.oauth import read_token_file, write_token_file
 
 from .config import *
+from .models import TwitterUser
 
 # Create your views here.
 
@@ -49,9 +51,14 @@ def oauth_helper(request):
                                     oauth_token=oauth_token,
                                     oauth_consumer_key=CONSUMER_KEY))
 
-    # Write out the final credentials that can be picked up after the following
-    write_token_file(OAUTH_FILE, oauth_token, oauth_token_secret)
-#     return HttpResponse("%s %s written to %s" % (oauth_token, oauth_token_secret, OAUTH_FILE))
+    # Save tokens to TwitterUser model
+    tuser, created = TwitterUser.objects.get_or_create(
+            OAUTH_TOKEN = oauth_token,
+            OAUTH_TOKEN_SECRET = oauth_token_secret
+    )
+    
+    django_login(request, tuser.user)
+
     return HttpResponseRedirect(request.build_absolute_uri(REDIRECT_URL_AFTER_AUTH))
 
 
@@ -84,11 +91,14 @@ def trends(request, woe_id):
 
 
 def confirm(request):
-    oauth_token, oauth_token_secret = read_token_file(OAUTH_FILE)
+    
+    tokens = TwitterUser.objects.filter(username=request.user).values_list('OAUTH_TOKEN', 'OAUTH_TOKEN_SECRET')
+    oauth_token, oauth_token_secret = tokens[0][0], tokens[0][1]
+    print(tokens[0][0], type(tokens))
 
     auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret,
                                    CONSUMER_KEY, CONSUMER_SECRET)
-
+  
     twitter_api = twitter.Twitter(auth=auth)
     print(oauth_token, twitter_api)
     try:
