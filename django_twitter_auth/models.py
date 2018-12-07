@@ -5,7 +5,6 @@ from django.conf import settings
 import twitter
 from twitter.oauth import read_token_file
 from .config import *
-from scipy.signal.wavelets import cascade
 
 # Create your models here.
 

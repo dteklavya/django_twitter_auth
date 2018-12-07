@@ -1,0 +1,4 @@
+Django==2.0.8
+django-twitter-auth==0.1
+pytz==2018.7
+twitter==1.18.0
