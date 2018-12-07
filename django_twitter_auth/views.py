@@ -66,8 +66,9 @@ def oauth_helper(request):
 
 def trends(request, woe_id):
 
-    print("WOE ID", woe_id)
-    oauth_token, oauth_token_secret = read_token_file(OAUTH_FILE)
+    tokens = TwitterUser.objects.filter(
+        username=request.user).values_list('OAUTH_TOKEN', 'OAUTH_TOKEN_SECRET')
+    oauth_token, oauth_token_secret = tokens[0][0], tokens[0][1]
 
     auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret,
                                    CONSUMER_KEY, CONSUMER_SECRET)
@@ -92,15 +93,14 @@ def trends(request, woe_id):
 
 def confirm(request):
     
-    tokens = TwitterUser.objects.filter(username=request.user).values_list('OAUTH_TOKEN', 'OAUTH_TOKEN_SECRET')
+    tokens = TwitterUser.objects.filter(
+        username=request.user).values_list('OAUTH_TOKEN', 'OAUTH_TOKEN_SECRET')
     oauth_token, oauth_token_secret = tokens[0][0], tokens[0][1]
-    print(tokens[0][0], type(tokens))
 
     auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret,
                                    CONSUMER_KEY, CONSUMER_SECRET)
   
     twitter_api = twitter.Twitter(auth=auth)
-    print(oauth_token, twitter_api)
     try:
         screen_name = twitter_api.account.verify_credentials()['screen_name']
         return HttpResponse("Twitter OAuth Dance Completed Successfully")        
