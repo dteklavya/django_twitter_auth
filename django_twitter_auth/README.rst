@@ -29,7 +29,11 @@ Quick Start
 
     url('twitter_oauth/', include('django_twitter_auth.urls')),
     
-3. Start the development server and visit http://127.0.0.1:8000/twitter_oauth/dance
+3. Run migrate to install the TwitterUser model that is used to store user's twitter tokens::
+
+		python manage.py migrate
+    
+4. Start the development server and visit http://127.0.0.1:8000/twitter_oauth/dance
    to get user's authorization.
 
 5. Once the OAuth Dance is complete, page redirects to http://127.0.0.1:8000/twitter_oauth/confirm.
