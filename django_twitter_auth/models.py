@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
+import string
+from random import randint, choice
+
 import twitter
 from twitter.oauth import read_token_file
 from .config import *
@@ -45,9 +48,14 @@ class TwitterUser(models.Model):
                 return
             
             # New user.
+            # Setup a random password
+            
+            chars = string.ascii_letters + string.punctuation + string.digits + string.ascii_uppercase
+            password =  "".join(choice(chars) for x in range(randint(16, 26)))
+            
             user = User.objects.create_user(
                     username=self.username,
-                    password=''
+                    password=password
                 )
             self.user = user
         super(TwitterUser, self).save(*args, **kwargs)
