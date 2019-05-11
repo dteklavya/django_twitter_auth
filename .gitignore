@@ -3,4 +3,6 @@ config.py
 tp_auth
 dist
 *.egg-info
+*.idea
+*__pycache__*
 
