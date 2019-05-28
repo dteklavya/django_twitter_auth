@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.contrib.auth import login
 
 import string
 from random import randint, choice
@@ -67,7 +68,20 @@ class TwitterUser(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete='cascade')
 
 
-def oauth_twitter_login(user):
+def oauth_twitter_login(request, user):
+    """
+
+    :param request:
+    :param user:
+
+    Gets user's tokens if available or redirects to Twitter API for complete -
+    OAuth dance.
+
+    If successful, returns authorized handle from Twitter.
+
+    :return:
+    """
+
     tokens = TwitterUser.objects.filter(
         username=user).values_list('OAUTH_TOKEN', 'OAUTH_TOKEN_SECRET')
     oauth_token, oauth_token_secret = tokens[0][0], tokens[0][1]
@@ -75,6 +89,8 @@ def oauth_twitter_login(user):
     auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret,
                                    CONSUMER_KEY, CONSUMER_SECRET)
 
+    # Make sure user logs in to the dJango ecosystem as well.
+    login(request, user)
     return twitter.Twitter(auth=auth)
 
 

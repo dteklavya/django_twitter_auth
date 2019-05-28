@@ -1,3 +1,5 @@
 Django==2.0.8
 pytz==2018.7
 twitter==1.18.0
+pymongo-3.8.0
+celery-4.3.0

@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect, render_to_response, HttpResponse
 from django.shortcuts import HttpResponseRedirect
 from django.contrib.auth import login as django_login
+from django.conf import settings
 
 import json
 import twitter
@@ -76,7 +77,8 @@ def confirm(request):
     twitter_api = twitter.Twitter(auth=auth)
     try:
         screen_name = twitter_api.account.verify_credentials()['screen_name']
-        return HttpResponse("Twitter OAuth Dance Completed Successfully")        
+        return redirect(settings.POST_TWAUTH_URL)
     except twitter.api.TwitterHTTPError:
         return HttpResponse("Twitter returned error. Something went wrong with authorization.") 
 
+# TODO: git clone https://github.com/twbs/bootstrap.git
