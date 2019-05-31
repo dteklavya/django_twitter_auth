@@ -89,9 +89,10 @@ def oauth_twitter_login(request, user):
     auth = twitter.oauth.OAuth(oauth_token, oauth_token_secret,
                                    CONSUMER_KEY, CONSUMER_SECRET)
 
-    # Make sure user logs in to the dJango ecosystem as well.
-    login(request, user)
-    return twitter.Twitter(auth=auth)
+    # Make sure user logs in to the dJango ecosystem if this is a request from django.
+    if request:
+        login(request, user)
+    return twitter.Twitter(auth=auth, format='json')
 
 
 # Get Twitter Streaming OAuth API
