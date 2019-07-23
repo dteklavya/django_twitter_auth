@@ -82,6 +82,10 @@ def oauth_twitter_login(request, user):
     :return:
     """
 
+    # TODO: Implement switch between context - admin and user...
+    # Admin context runs with its own OAuth creds and Twitter search queries.
+    # Do we need end user's Twitter authorization at all?
+
     tokens = TwitterUser.objects.filter(
         username=user).values_list('OAUTH_TOKEN', 'OAUTH_TOKEN_SECRET')
     oauth_token, oauth_token_secret = tokens[0][0], tokens[0][1]
@@ -90,7 +94,8 @@ def oauth_twitter_login(request, user):
                                    CONSUMER_KEY, CONSUMER_SECRET)
 
     # Make sure user logs in to the dJango ecosystem if this is a request from django.
-    if request:
+    # FIXME: Do not login again if the user is already logged in...
+    if request and not request.user.is_authenticated():
         login(request, user)
     return twitter.Twitter(auth=auth, format='json')
 
@@ -105,3 +110,9 @@ def oauth_twitter_streaming(user):
                                    CONSUMER_KEY, CONSUMER_SECRET)
 
     return twitter.TwitterStream(auth=auth)
+
+
+# Get twitter handle for admin, no authorization needed.
+def app_twitter_login():
+    auth = twitter.oauth.OAuth(ADMIN_TOKEN, ADMIN_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
+    return twitter.Twitter(auth=auth, format='json')
